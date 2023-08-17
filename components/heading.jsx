@@ -6,7 +6,7 @@ const Heading = ({ title, description, color, bgColor, Icon }) => {
       <div className={cn("flex items-center w-fit p-2 rounded-md", bgColor)}>
         <Icon className={cn("w-8 h-8", color)} />
       </div>
-      <div className="spaxe-y-2">
+      <div className="space-y-1">
         <h1 className="text-3xl font-bold">{title}</h1>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>

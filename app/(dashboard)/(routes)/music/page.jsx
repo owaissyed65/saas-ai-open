@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare } from "lucide-react";
+import { Music } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -14,9 +14,6 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Empty from "@/components/empty";
 import Loader from "@/components/loader";
-import { cn } from "@/lib/utils";
-import { BotAvatar, UserAvatar } from "@/components/user-bot-avatar";
-import ReactMarkdown from "react-markdown";
 
 const formSchema = z.object({
   prompt: z.string().min(2, {
@@ -24,9 +21,9 @@ const formSchema = z.object({
   }),
 });
 
-const CodePage = () => {
+const MusicPage = () => {
   const router = useRouter();
-  const [messages, setmessages] = useState([]);
+  const [music, setMusic] = useState();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -39,19 +36,9 @@ const CodePage = () => {
 
   async function onSubmit(values) {
     try {
-      const userMessage = {
-        role: "user",
-        content: values.prompt,
-      };
-
-      const newMessages = [...messages, userMessage];
-
-      const response = await axios.post("/api/code", {
-        messages: newMessages,
-      });
-
-      setmessages((current) => [...current, userMessage, response.data]);
-
+      setMusic(undefined);
+      const response = await axios.post("/api/music", values);
+      setMusic(response.data.audio);
       form.reset();
     } catch (error) {
       console.log(error);
@@ -62,11 +49,11 @@ const CodePage = () => {
   return (
     <div className="max-w-72 mx-auto">
       <Heading
-        title={"Code"}
-        description={"Generate code using descriptive text"}
-        color={"text-violet-500"}
-        bgColor={"bg-violet-500/10"}
-        Icon={MessageSquare}
+        title={"Music"}
+        description={"Turn your prompt into music"}
+        color={"text-red-500"}
+        bgColor={"bg-red-500/10"}
+        Icon={Music}
       />
       <div className="px-4 lg:px-8">
         <div className="mb-4">
@@ -83,7 +70,7 @@ const CodePage = () => {
                     <Input
                       {...field}
                       className="border-0 focus-visible:ring-0 focus-visible:ring-transparent outline-none focus-visible:outline-none focus-visible:border-none placeholder:text-muted-foreground placeholder:italic "
-                      placeholder="Write a button code for react..."
+                      placeholder="A violin..."
                     />
                     <FormMessage />
                   </FormItem>
@@ -105,44 +92,16 @@ const CodePage = () => {
               <Loader />
             </div>
           )}
-          {messages?.length === 0 && !isLoading && (
-            <Empty label={"No conversation started yet.."} />
+          {!music && !isLoading && <Empty label={"No music generated yet.."} />}
+          {music && (
+            <audio className="w-full mt-8" controls>
+              <source src={music} />
+            </audio>
           )}
-          <div className="flex flex-col-reverse gap-y-4">
-            {messages?.map((message) => (
-              <div
-                key={message?.content}
-                className={cn(
-                  "p-8 flex items-start gap-x-8 rounded-lg",
-                  message?.role === "user"
-                    ? "bg-white border border-black/10"
-                    : "bg-muted"
-                )}
-              >
-                {message?.role === "user" ? <UserAvatar /> : <BotAvatar />}
-                <ReactMarkdown 
-                components={{
-                  pre:({node,...props})=>(
-                  <div className="overflow-auto my-2 w-full bg-black/10 p-2 rounded-lg">
-                    <pre {...props}/>
-                  </div>
-                ),
-                code:({node,...props})=>(
-                  <code className="bg-black/10 rounded-lg p-1" {...props}/>
-                ),
-                
-              }}
-              className="overflow-hidden text-sm leading-7 "
-                >
-                  {message?.content||""}
-                </ReactMarkdown>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default CodePage;
+export default MusicPage;
