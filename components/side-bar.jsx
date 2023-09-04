@@ -14,11 +14,12 @@ import {
   Settings,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import FreeCounter from "@/components/free-counter";
 const montSerrat = Montserrat({
   weight: "600",
   subsets: ["latin"],
 });
-const SideBar = () => {
+const SideBar = ({ apiLimitCount }) => {
   const pathName = usePathname();
   const routes = [
     {
@@ -65,7 +66,7 @@ const SideBar = () => {
     },
   ];
   return (
-    <div className="flex text-white space-y-4 flex-col py-4 bg-[#111827] h-full">
+    <div className="flex text-white space-y-4 flex-col py-4 bg-[#111827] h-full justify-between">
       <div className="px-3 py-2 ">
         <Link href="/dashboard" className="flex items-center pl-3 mb-14">
           <div className="relative w-8 h-8 mr-4 rounded-full">
@@ -87,7 +88,9 @@ const SideBar = () => {
               key={route.href}
               className={cn(
                 "text-sm flex p-3 justify-start font-medium cursor-pointer hover:text-white hover:bg-white/10 rounded-lg transition-all w-full",
-                pathName === route.href ? "text-white bg-white/10" : "text-zinc-500"
+                pathName === route.href
+                  ? "text-white bg-white/10"
+                  : "text-zinc-500"
               )}
             >
               <div className="flex items-center gap-3">
@@ -98,6 +101,7 @@ const SideBar = () => {
           ))}
         </div>
       </div>
+      <FreeCounter apiLimitCount={apiLimitCount} />
     </div>
   );
 };

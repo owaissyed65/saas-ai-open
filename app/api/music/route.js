@@ -1,3 +1,4 @@
+import { checkApiLimit, increaseApiLimit } from "@/lib/api-limit";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 import Replicate from "replicate";
@@ -19,6 +20,11 @@ export async function POST(req) {
       return new NextResponse("prompt is required", { status: 500 });
     }
 
+    const freetrial = await checkApiLimit();
+    if (!freetrial) {
+      return new NextResponse("Free trail has expired", { status: 403 });
+    }
+
     const response = await replicate.run(
       "riffusion/riffusion:8cf61ea6c56afd61d8f5b9ffd14d7c216c0a93844ce2d82ac1c9ecc9c7f24e05",
       {
@@ -27,6 +33,7 @@ export async function POST(req) {
         },
       }
     );
+    await increaseApiLimit();
     return NextResponse.json(response);
   } catch (error) {
     console.log(`[MUSIC_POST]`);
